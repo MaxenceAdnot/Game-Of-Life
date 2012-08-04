@@ -1,0 +1,6 @@
+autoreconf --install ( if ./configure is not available )
+mkdir -p build && cd build
+../configure
+make
+su
+make install
