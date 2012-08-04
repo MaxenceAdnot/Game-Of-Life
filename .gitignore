@@ -1,15 +1,13 @@
-lib-cov
-*.seed
-*.log
-*.csv
-*.dat
-*.out
-*.pid
-*.gz
+# http://www.gnu.org/software/automake
 
-pids
-logs
-results
+Makefile.in
 
-node_modules
-npm-debug.log
+# http://www.gnu.org/software/autoconf
+
+/autom4te.cache
+/aclocal.m4
+/compile
+/configure
+/depcomp
+/install-sh
+/missing
