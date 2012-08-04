@@ -1,0 +1,3 @@
+#! /bin/sh
+
+autoreconf --install && mkdir -p build && cd build && ../configure && make && cd ../ && ./build/src/gameoflife
