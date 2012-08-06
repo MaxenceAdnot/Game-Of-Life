@@ -1,2 +1,2 @@
 bin_PROGRAMS =  gameoflife
-gameoflife_SOURCES = main.cpp Gameoflife.cpp Gameoflife.h utils.cpp utils.h
+gameoflife_SOURCES = main.c Gameoflife.c Gameoflife.h utils.c utils.h

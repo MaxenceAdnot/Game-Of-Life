@@ -11,6 +11,6 @@
 
 
   void init_colors(); 
-  void print_color(WINDOW *win, int y, int x, int color, std::string str);
+  void print_color(WINDOW *win, int y, int x, int color, const char* str);
  
 #endif
