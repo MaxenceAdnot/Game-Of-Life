@@ -6,7 +6,9 @@ using namespace std;
 
 void init_colors(){
   start_color();
-  init_pair(BLUE, COLOR_BLUE, COLOR_BLACK);
+  init_pair(WHITE, COLOR_WHITE, COLOR_BLACK);
+  init_pair(BLUE,  COLOR_BLUE,  COLOR_BLACK);
+  init_pair(RED,   COLOR_RED,   COLOR_BLACK);
 }
 
 
