@@ -17,6 +17,7 @@ int main()
 
   initscr();
   init_colors();
+  Gameoflife gol;
   print_color(stdscr, LINES / 2, (COLS - title.length()) / 2, WHITE,  title);
   print_color(stdscr, LINES - 1.0, 0, BLUE, credits);
   refresh();
