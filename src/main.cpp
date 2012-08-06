@@ -5,6 +5,7 @@
 #include <ncurses.h>
 #include <string>
 #include "utils.h"
+#include "Gameoflife.h"
 
 using namespace std;
 
