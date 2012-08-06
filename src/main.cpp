@@ -2,18 +2,22 @@
   #include <config.h>
 #endif
 
-#include <string>
 #include <ncurses.h>
+#include <string>
+#include "utils.h"
 
 using namespace std;
 
 int main()
 {
-
+  
   string mesg = "Game Of Life";
+  string credits = "Kevin Bacas & Maxence Adnot";
+
   initscr();
+  init_colors();
   mvprintw(LINES / 2, (COLS - mesg.length()) / 2, "%s" , mesg.c_str());
-  mvprintw(LINES - 1.0, 0, "Kevin Bacas & Maxence Adnot");
+  print_color(stdscr, LINES - 1.0, 0, BLUE, credits);
   refresh();
   getch();
   endwin(); 
