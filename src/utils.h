@@ -4,7 +4,10 @@
   #define DEAD 0
   #define LIVING 1
 
-  #define BLUE 1 
+
+  #define WHITE 0  
+  #define BLUE  1 
+  #define RED   2
 
 
   void init_colors(); 
