@@ -1,4 +1,4 @@
-#ifdef HAVoE_CONFIG_H
+#ifdef HAVE_CONFIG_H
   #include <config.h>
 #endif
 
@@ -11,17 +11,25 @@ using namespace std;
 
 int main()
 {
-  
-  string title = "Game Of Life";
-  string credits = "Kevin Bacas & Maxence Adnot";
+
+  /* Initialisation - Menu */
+  string str_title = "Game Of Life";
+  string str_press = "Press a touch to continue";
 
   initscr();
+  raw();
+  noecho();
   init_colors();
-  Gameoflife gol;
-  print_color(stdscr, LINES / 2, (COLS - title.length()) / 2, WHITE,  title);
-  print_color(stdscr, LINES - 1.0, 0, BLUE, credits);
+
+  print_color(stdscr, LINES / 2, (COLS - str_title.length()) / 2, WHITE, str_title);
+  print_color(stdscr, LINES - 1.0, 0, BLUE, str_press);
   refresh();
   getch();
+
+  /* GameOfLife */
+  erase();
+  Gameoflife gol;
+  gol.start();
   endwin(); 
   return 0;
 

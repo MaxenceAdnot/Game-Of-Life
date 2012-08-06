@@ -3,29 +3,30 @@
 #include "utils.h"
 #include "Gameoflife.h"
 
-class Gameoflife {
- private:
-  WINDOW *game;
-  int seed, running;
-  int numberAliveCellsAround();
-  
-  Gameoflife::Gameoflife(){
-    this.game = newwin(20,20,0,0);
-    bow(game,0,0);
+Gameoflife::Gameoflife(){
+  game = subwin(stdscr, (int)((LINES*9)/10) , (int)((COLS*9)/10) , (int)(LINES/40) , (int)(COLS/20));
+  box(game,0,0);
+  wrefresh(game);
+  seed = 0;
+  running = 0;
+}
+
+void Gameoflife::update(){
+
+}
+
+void Gameoflife::render(){
+  while (getch() != '\n'){
     wrefresh(game);
-    this.seed = 0;
-    this.running = 0;
   }
 
-  int Gameoflife::numberAliveCellsAround(){
-    
-  }
+}
 
-  void Gameoflife::update(){
+void Gameoflife::start(){
+  update();
+  render();
+}
 
-  }
-
-  void Gameoflife::render(){
-
-  }
+int Gameoflife::numberAliveCellsAround(){
+  return 0;
 }
