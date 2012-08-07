@@ -82,8 +82,45 @@ void play_mode(){
 
 
 int nbAliveCells(int y, int x){
+  
+  int n  = 0;
+  
+  if(y < LMAX)
+  {
+    n += cells[(y+1)*GCOLS+x] ? 1 : 0; /* Bottom */
+  }
+  if(y > 0)
+  {
+    n +=  cells[(y-1)*GCOLS+x] ? 1 : 0; /* Top */
+  }
 
-  return 3;
+  if(x < CMAX)
+  {
+    n +=  cells[y*GCOLS+(x+1)] ? 1 : 0; /* Right */
+    if(y > 0)
+    {
+      n += cells[(y-1)*GCOLS+(x+1)] ? 1 : 0; /* Top right */
+     }
+    if(y < LMAX)
+     {
+       n +=  cells[(y+1)*GCOLS+(x+1)] ? 1 : 0;/* Bottom right */
+     }
+  }
+  if(x >  0)
+  {
+    n += cells[y*GCOLS+(x-1)] ? 1 : 0; /* Left */
+    if(y > 0)
+    {
+      n += cells[(y-1)*GCOLS+(x-1)] ? 1 : 0; /* Top left */
+    }
+    if(y < LMAX)
+    {
+      n += cells[(y+1)*GCOLS+(x-1)] ? 1 : 0; /* Bottom left */
+    }
+  } 
+
+
+  return n;
 }
 
 
