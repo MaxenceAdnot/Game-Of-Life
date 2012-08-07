@@ -1,8 +1,10 @@
 #ifndef DEF_GAMEOFLIFE
 #define DEF_GAMEOFLIFE
 
-  void update();
-  void render();
-  void start();
+  int input_mode(char ch);
+  void play_mode();
+  void run_splash();
+  void run_game();
+  void destroy();
 
 #endif
