@@ -35,12 +35,12 @@ int input_mode(char ch){
          y=LMAX - 1;
        break;
      case ' ': /* Activate a cell */
-       if (cells[y*GCOLS+x] == 1){
+       if (cells[y*GCOLS+x] == 1){ /* Row-major order storage method */ 
          cells[y*GCOLS+x] = 0;
 	 mvwaddch(game, y, x, ' ');
        }
        else {
-         cells[y*GCOLS+x] = 1;
+         cells[y*GCOLS+x] = 1; 
          mvwaddch(game, y, x, 'O');
        }
        break;
@@ -105,6 +105,9 @@ void run_game(){
 void destroy(){
 
   delwin(game);
+  
+  free(cells);
+  free(nextcells);  
 
 }
 
