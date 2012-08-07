@@ -8,6 +8,9 @@ static WINDOW *game      = NULL;
 static char   *cells     = NULL;
 static char   *nextcells = NULL;
 
+static int     seeds  = 0;
+static char cmds[] = "k : Quit            z,q,s,d : Move             Space : Activate            Enter : Run            Seeds: ";
+
 static int     GLINES = 0;
 static int     GCOLS  = 0;
 static int     CMAX   = 0;
@@ -34,21 +37,21 @@ int input_mode(char ch){
        if((y=(y-1)%LMAX)==0)
          y=LMAX - 1;
        break;
-     case ' ': /* Activate a cell */
-       if (cells[y*GCOLS+x] == 1){ /* Row-major order storage method */ 
-         cells[y*GCOLS+x] = 0;
-	 mvwaddch(game, y, x, ' ');
-       }
-       else {
-         cells[y*GCOLS+x] = 1; 
-         mvwaddch(game, y, x, 'O');
-       }
-       break;
-     case '\n':
-       play_mode();
-       break;
-     case 'k':
-       return 0;
+    case ' ': /* Activate a cell */
+      if (cells[y*GCOLS+x] == 1){ /* Row-major order storage method */ 
+        cells[y*GCOLS+x] = 0;
+         mvwaddch(game, y, x, ' ');
+      }
+      else {
+        cells[y*GCOLS+x] = 1; 
+        mvwaddch(game, y, x, 'O');
+      }
+      break;
+    case '\n':
+      play_mode();
+      break;
+    case 'k':
+      return 0;
   }
   wmove(game, y, x); 
   wrefresh(game);
@@ -58,8 +61,8 @@ int input_mode(char ch){
 
 void play_mode(){
   
-  int x , y , n; 
-  
+  int x , y , n;
+   
   memcpy(nextcells, cells, GLINES*GCOLS*sizeof(char));  
 
   for (x = 0; x < GCOLS; x++){
@@ -76,6 +79,8 @@ void play_mode(){
     }
   }
   memcpy(cells, nextcells, GLINES*GCOLS*sizeof(char));
+  mvwprintw(stdscr,LINES - 5, (int)(COLS/20), "%s %d", cmds, ++seeds);
+  box(game,0,0);
   wrefresh(game);
 
 }
@@ -118,8 +123,7 @@ int nbAliveCells(int y, int x){
       n += cells[(y+1)*GCOLS+(x-1)] ? 1 : 0; /* Bottom left */
     }
   } 
-
-
+  
   return n;
 }
 
@@ -139,7 +143,7 @@ void run_splash(){
 
 void run_game(){ 
   
-  char cmds[] = "k : Quit            z,q,s,d : Move            Enter : Run";
+  
   char in;
 
   GLINES = (int)((LINES*9)/10);
@@ -153,7 +157,7 @@ void run_game(){
   nextcells = malloc(GLINES*GCOLS*sizeof(char));
   memset(nextcells, 0, GLINES*GCOLS*sizeof(char));
 
-  mvprintw(LINES - 5, (int)(COLS/20), "%s", cmds);
+  mvprintw(LINES - 5, (int)(COLS/20), "%s %d", cmds, seeds);
   game = subwin(stdscr, GLINES , GCOLS , (int)(LINES/40) , (int)(COLS/20));
   box(game,0,0);
   wmove(game, GLINES / 2, GCOLS / 2);
