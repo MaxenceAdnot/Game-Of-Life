@@ -57,8 +57,35 @@ int input_mode(char ch){
 
 
 void play_mode(){
+  
+  int x , y , n; 
+  
+  memcpy(nextcells, cells, GLINES*GCOLS*sizeof(char));  
+
+  for (x = 0; x < GCOLS; x++){
+    for(y=0 ; y < GLINES; y++){
+      n = nbAliveCells(y,x);
+      if (n == 3){
+        nextcells[y*GCOLS+x] = 1; 
+        mvwaddch(game, y, x, 'O');
+      }   
+      else if( n < 2 || n > 3){
+	nextcells[y*GCOLS+x] = 0;
+	mvwaddch(game, y, x, ' ');
+      }
+    }
+  }
+  memcpy(cells, nextcells, GLINES*GCOLS*sizeof(char));
+  wrefresh(game);
 
 }
+
+
+int nbAliveCells(int y, int x){
+
+  return 3;
+}
+
 
 void run_splash(){
 
