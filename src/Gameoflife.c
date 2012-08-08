@@ -22,28 +22,28 @@ int input_mode(char ch){
   getyx(game, y, x);
   switch(ch){
     case 'd': /* Right */
-      if((x=(x+1)%CMAX)==0)
+      if((x=(x+1)%(GCOLS-1))==0)
         x = 1; 
       break;
     case 'q': /* Left */
-       if((x=(x-1)%CMAX)==0)
-         x=CMAX - 1;
+      if((x=(x-1)%(GCOLS-1))==0)
+         x=CMAX;
        break;
     case 's': /* Down */
-       if((y=(y+1)%LMAX)==0)
+      if((y=(y+1)%(GLINES-1))==0)
          y = 1;
        break;
     case 'z': /* Up */
-       if((y=(y-1)%LMAX)==0)
-         y=LMAX - 1;
+      if((y=(y-1)%(GLINES-1))==0)
+         y=LMAX;
        break;
     case ' ': /* Activate a cell */
-      if (cells[y*GCOLS+x] == 1){ /* Row-major order storage method */ 
-        cells[y*GCOLS+x] = 0;
+      if (cells[(y-1)*CMAX+(x-1)] == 1){ /* Row-major order storage method */ 
+        cells[(y-1)*CMAX+(x-1)] = 0;
          mvwaddch(game, y, x, ' ');
       }
       else {
-        cells[y*GCOLS+x] = 1; 
+        cells[(y-1)*CMAX+(x-1)] = 1; 
         mvwaddch(game, y, x, 'O');
       }
       break;
@@ -63,22 +63,22 @@ void play_mode(){
   
   int x , y , n;
    
-  memcpy(nextcells, cells, GLINES*GCOLS*sizeof(char));  
+  memcpy(nextcells, cells, LMAX*CMAX*sizeof(char));  
 
-  for (x = 0; x < GCOLS; x++){
-    for(y=0 ; y < GLINES; y++){
-      n = nbAliveCells(y,x);
+  for (x = 1; x < GCOLS - 1; x++){
+    for(y= 1 ; y < GLINES - 1 ; y++){
+      n = nbAliveCells(y-1,x-1);
       if (n == 3){
-        nextcells[y*GCOLS+x] = 1; 
+        nextcells[(y-1)*CMAX+(x-1)] = 1; 
         mvwaddch(game, y, x, 'O');
       }   
       else if( n < 2 || n > 3){
-	nextcells[y*GCOLS+x] = 0;
+	nextcells[(y-1)*CMAX+(x-1)] = 0;
 	mvwaddch(game, y, x, ' ');
       }
     }
   }
-  memcpy(cells, nextcells, GLINES*GCOLS*sizeof(char));
+  memcpy(cells, nextcells, LMAX*CMAX*sizeof(char));
   mvwprintw(stdscr,LINES - 5, (int)(COLS/20), "%s %d", cmds, ++seeds);
   box(game,0,0);
   wrefresh(game);
@@ -90,37 +90,37 @@ int nbAliveCells(int y, int x){
   
   int n  = 0;
   
-  if(y < LMAX)
+  if(y < GLINES - 1 )
   {
-    n += cells[(y+1)*GCOLS+x] ? 1 : 0; /* Bottom */
+    n += cells[(y+1)*CMAX+x] ? 1 : 0; /* Bottom */
   }
   if(y > 0)
   {
-    n +=  cells[(y-1)*GCOLS+x] ? 1 : 0; /* Top */
+    n +=  cells[(y-1)*CMAX+x] ? 1 : 0; /* Top */
   }
 
-  if(x < CMAX)
+  if(x < GCOLS - 1 )
   {
-    n +=  cells[y*GCOLS+(x+1)] ? 1 : 0; /* Right */
+    n +=  cells[y*CMAX+(x+1)] ? 1 : 0; /* Right */
     if(y > 0)
     {
-      n += cells[(y-1)*GCOLS+(x+1)] ? 1 : 0; /* Top right */
+      n += cells[(y-1)*CMAX+(x+1)] ? 1 : 0; /* Top right */
      }
-    if(y < LMAX)
+    if(y < GLINES - 1 )
      {
-       n +=  cells[(y+1)*GCOLS+(x+1)] ? 1 : 0;/* Bottom right */
+       n +=  cells[(y+1)*CMAX+(x+1)] ? 1 : 0;/* Bottom right */
      }
   }
   if(x >  0)
   {
-    n += cells[y*GCOLS+(x-1)] ? 1 : 0; /* Left */
+    n += cells[y*CMAX+(x-1)] ? 1 : 0; /* Left */
     if(y > 0)
     {
-      n += cells[(y-1)*GCOLS+(x-1)] ? 1 : 0; /* Top left */
+      n += cells[(y-1)*CMAX+(x-1)] ? 1 : 0; /* Top left */
     }
-    if(y < LMAX)
+    if(y < GLINES - 1)
     {
-      n += cells[(y+1)*GCOLS+(x-1)] ? 1 : 0; /* Bottom left */
+      n += cells[(y+1)*CMAX+(x-1)] ? 1 : 0; /* Bottom left */
     }
   } 
   
@@ -148,14 +148,14 @@ void run_game(){
 
   GLINES = (int)((LINES*9)/10);
   GCOLS = (int)((COLS*9)/10);
-  LMAX = GLINES - 1;
-  CMAX = GCOLS  - 1;
+  LMAX = GLINES - 2;
+  CMAX = GCOLS  - 2;
   
-  cells = malloc(GLINES*GCOLS*sizeof(char));
-  memset(cells, 0, GLINES*GCOLS*sizeof(char));
+  cells = malloc(LMAX*CMAX*sizeof(char));
+  memset(cells, 0, LMAX*CMAX*sizeof(char));
 
-  nextcells = malloc(GLINES*GCOLS*sizeof(char));
-  memset(nextcells, 0, GLINES*GCOLS*sizeof(char));
+  nextcells = malloc(LMAX*CMAX*sizeof(char));
+  memset(nextcells, 0, LMAX*CMAX*sizeof(char));
 
   mvprintw(LINES - 5, (int)(COLS/20), "%s %d", cmds, seeds);
   game = subwin(stdscr, GLINES , GCOLS , (int)(LINES/40) , (int)(COLS/20));
