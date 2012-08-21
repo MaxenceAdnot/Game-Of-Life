@@ -81,16 +81,16 @@ input_mode(char ch){
   switch(ch){
 
     case 'd': /* Right */
-      x= (x+1)%t_COLS; 
+      x= modulo(x+1,t_COLS); 
       break;
     case 'q': /* Left */
-      x= (x-1)%t_COLS;
+      x= modulo(x-1 , t_COLS);
       break;
     case 's': /* Down */    
-      y = (y+1)%t_LINES;
+      y = modulo(y+1, t_LINES);
       break;
     case 'z': /* Up */
-      y= (y-1)%t_LINES;
+      y= modulo(y-1, t_LINES);
       break;
 
     case ' ': /* Activate a cell */

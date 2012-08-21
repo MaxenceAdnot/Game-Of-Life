@@ -19,3 +19,13 @@ void print_color(WINDOW *win, int y, int x, int color, const char* str) {
   wrefresh(win);
 
 }
+
+int modulo(int x,int k) {
+  int valeur = x%k;
+  if (valeur<0) {
+    return valeur+k;
+  }
+  else {
+    return valeur;
+  }
+}
