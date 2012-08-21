@@ -12,5 +12,5 @@
 
   void init_colors(); 
   void print_color(WINDOW *win, int y, int x, int color, const char* str);
-int modulo(int x, int k); 
+  int modulo(int x, int k); 
 #endif

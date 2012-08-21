@@ -3,19 +3,19 @@
 #include "utils.h"
 #include "Gameoflife.h"
 
-static WINDOW * gameWin = NULL;  // Window for game grid
-static WINDOW * borderWin = NULL; // Window for border
+static WINDOW * gameWin = NULL;  /* Window for game grid */
+static WINDOW * borderWin = NULL; /* Window for border */
 
 static unsigned char * cur_tab = NULL;
 static unsigned char * tmp_tab = NULL;
 
-static unsigned char * t1 = NULL; // Tab 1
-static unsigned char * t2 = NULL; // Tab 2
+static unsigned char * t1 = NULL; /* Tab 1 */
+static unsigned char * t2 = NULL; /* Tab 2 */
 
-static int t_LINES = 0; // Number of lines used for game grid
-static int t_COLS  = 0; // Number of cols  used for game grid 
+static int t_LINES = 0; /* Number of lines used for game grid */
+static int t_COLS  = 0; /* Number of cols  used for game grid */ 
 
-static int x,y,seed = 0; // (x,y) and number of cycles
+static int x,y,seed = 0; /* (x,y) and number of cycles */
 
 
 
@@ -50,15 +50,15 @@ run_game(){
   tmp_tab = t2;
 
   /* Set the command line */
-  print_color(stdscr,LINES - 1.0, COLS - t_COLS, BLUE, "zqsd : Move    space : (De)Activate    enter : Run    k : Quit");
-  mvprintw(LINES - 1.0, COLS + 65 - t_COLS, " Seed : %d", seed);
+  print_color(stdscr,LINES - 1.0, COLS - t_COLS, BLUE, "ZQSD : Move    SPACE : (De)Activate    ENTER : Run    I : Restart     K : Quit");
+  mvprintw(LINES - 1.0, COLS + 80 - t_COLS, " Seed : %d          ", seed);
 
   /* Create windows */
   borderWin = newwin( t_LINES + 2, t_COLS + 2, 0 , (COLS - t_COLS) / 2);
   gameWin = newwin( t_LINES, t_COLS, 1, ((COLS - t_COLS) /2) + 1);
   box(borderWin, 0, 0);
 
-  /* Place the cursor in the game window */
+  /* Move the cursor in the game window */
   wmove(gameWin, 0, 0);
 
   /* Refresh windows*/
@@ -66,7 +66,7 @@ run_game(){
   wrefresh(borderWin);
   wrefresh(gameWin);
   
-  /* Process input */
+  /* Handle input */
   do {
     in = getch();
   }
@@ -104,8 +104,16 @@ input_mode(char ch){
       }
       break;
 
-    case '\n':
+    case '\n': /* Run */
       play_mode();
+      break;
+
+    case 'i': /* Restart */
+      memset(t1, 0, t_LINES*t_COLS*sizeof(unsigned char *));
+      memset(t2, 0, t_LINES*t_COLS*sizeof(unsigned char *));
+      werase(gameWin);
+      seed = 0;
+      mvprintw(LINES - 1.0, COLS + 80 - t_COLS, " Seed : %d          ", seed);
       break;
 
     case 'k':
@@ -116,39 +124,44 @@ input_mode(char ch){
   mvprintw(1,0, "%d   ", y);
   mvprintw(2,0, "%d   ", t_COLS);
   mvprintw(3,0, "%d   ", t_LINES);
-  refresh();
 
-  wmove(gameWin, y, x); 
+  wmove(gameWin, y, x);
+  
+  /* Seems to be useless but because it's warm */
+  refresh(); 
   wrefresh(gameWin);
+
   return 1;
 
 }
 
 void
-play_mode(){
+play_mode()
+{
 	unsigned int life;
 
-	for (x = 0; t_COLS; x++)
+	/* Checking the 8 cases around */
+	for (x = 0; x < t_COLS; x++)
 	{
 		for (y = 0; y < t_LINES; y++)
 		{
 		  life = 0;
 		  if ((y + 1) < t_LINES)
-			{
+		  {
 			  if (x && cur_tab[(y+1)*t_COLS+(x-1)] == 1)
 				life++;
 			  if (cur_tab[(y+1)*t_COLS+x] == 1)
 				life++;
 			  if ((x + 1) < t_COLS && cur_tab[(y+1)*t_COLS+(x+1)] == 1)
 				life++;
-			}
+	          }
 		  if (x)
-			{
+	          {
 			  if (cur_tab[y*t_COLS+(x-1)] == 1)
 				life++;
-			  if (y && cur_tab[(y-1)*t_COL+(x-1)] == 1)
+			  if (y && cur_tab[(y-1)*t_COLS+(x-1)] == 1)
 				life++;
-			}
+	   	  }
 		  if (y && cur_tab[(y-1)*t_COLS+x] == 1)
 			life++;
 		  if (y && (x + 1) < t_COLS  && cur_tab[(y-1)*t_COLS+(x+1)] == 1)
@@ -162,19 +175,27 @@ play_mode(){
 		  mvwaddch(gameWin, y, x, tmp_tab[y*t_COLS+x] ? '0' : ' ');
 		}
 	}
+        
 
+        /* Switch tabs */
 	if (cur_tab == t1)
 	{
 	  cur_tab = t2;
 	  tmp_tab = t1;
 	}
-    else
+        else
 	{
-	  cur_tap = t1;
+	  cur_tab = t1;
 	  tmp_tab = t2;
 	}
 
+        /* Increase the number of cycles and move the cursor to (0,0) */
+        mvprintw(LINES - 1.0, COLS + 80 - t_COLS, " Seed : %d          ", ++seed);
+        wmove(gameWin, 0, 0);
 
+        /* Seems to be useless but for the beauty of it */
+	refresh();
+        wrefresh(gameWin);
 }
 
 void 
