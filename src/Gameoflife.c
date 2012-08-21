@@ -105,7 +105,7 @@ input_mode(char ch){
       break;
 
     case '\n':
-      /* play_mode(); */
+      play_mode();
       break;
 
     case 'k':
@@ -121,6 +121,59 @@ input_mode(char ch){
   wmove(gameWin, y, x); 
   wrefresh(gameWin);
   return 1;
+
+}
+
+void
+play_mode(){
+	unsigned int life;
+
+	for (x = 0; t_COLS; x++)
+	{
+		for (y = 0; y < t_LINES; y++)
+		{
+		  life = 0;
+		  if ((y + 1) < t_LINES)
+			{
+			  if (x && cur_tab[(y+1)*t_COLS+(x-1)] == 1)
+				life++;
+			  if (cur_tab[(y+1)*t_COLS+x] == 1)
+				life++;
+			  if ((x + 1) < t_COLS && cur_tab[(y+1)*t_COLS+(x+1)] == 1)
+				life++;
+			}
+		  if (x)
+			{
+			  if (cur_tab[y*t_COLS+(x-1)] == 1)
+				life++;
+			  if (y && cur_tab[(y-1)*t_COL+(x-1)] == 1)
+				life++;
+			}
+		  if (y && cur_tab[(y-1)*t_COLS+x] == 1)
+			life++;
+		  if (y && (x + 1) < t_COLS  && cur_tab[(y-1)*t_COLS+(x+1)] == 1)
+			life++;
+		  if ((x + 1) < t_COLS && cur_tab[y*t_COLS+(x+1)] == 1)
+			life++;
+		  if (cur_tab[y*t_COLS+x] == 1)
+			tmp_tab[y*t_COLS+x] = (life != 2 && life != 3) ? 0 : 1;
+		  else
+			tmp_tab[y*t_COLS+x] = (life == 3) ? 1 : 0;
+		  mvwaddch(gameWin, y, x, tmp_tab[y*t_COLS+x] ? '0' : ' ');
+		}
+	}
+
+	if (cur_tab == t1)
+	{
+	  cur_tab = t2;
+	  tmp_tab = t1;
+	}
+    else
+	{
+	  cur_tap = t1;
+	  tmp_tab = t2;
+	}
+
 
 }
 
