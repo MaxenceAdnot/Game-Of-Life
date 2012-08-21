@@ -1,4 +1,4 @@
-#ifndef DEF_GAMEOFLIFE
+﻿#ifndef DEF_GAMEOFLIFE
 #define DEF_GAMEOFLIFE
 
   int input_mode(char ch);

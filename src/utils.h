@@ -1,4 +1,4 @@
-#ifndef DEF_UTILS
+﻿#ifndef DEF_UTILS
 #define DEF_UTILS 
 
   #define DEAD 0
