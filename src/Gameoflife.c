@@ -3,179 +3,131 @@
 #include "utils.h"
 #include "Gameoflife.h"
 
+static WINDOW * gameWin = NULL;  // Window for game grid
+static WINDOW * borderWin = NULL; // Window for border
 
-static WINDOW *game      = NULL;
-static char   *cells     = NULL;
-static char   *nextcells = NULL;
+static unsigned char * cur_tab = NULL;
+static unsigned char * tmp_tab = NULL;
 
-static int     seeds  = 0;
-static char cmds[] = "k : Quit            z,q,s,d : Move             Space : Activate            Enter : Run            Seeds: ";
+static unsigned char * t1 = NULL; // Tab 1
+static unsigned char * t2 = NULL; // Tab 2
 
-static int     GLINES = 0;
-static int     GCOLS  = 0;
-static int     CMAX   = 0;
-static int     LMAX   = 0;
+static int t_LINES = 0; // Number of lines used for game grid
+static int t_COLS  = 0; // Number of cols  used for game grid 
 
-int input_mode(char ch){
-  int y,x;
-  
-  getyx(game, y, x);
-  switch(ch){
-    case 'd': /* Right */
-      if((x=(x+1)%(GCOLS-1))==0)
-        x = 1; 
-      break;
-    case 'q': /* Left */
-      if((x=(x-1)%(GCOLS-1))==0)
-         x=CMAX;
-       break;
-    case 's': /* Down */
-      if((y=(y+1)%(GLINES-1))==0)
-         y = 1;
-       break;
-    case 'z': /* Up */
-      if((y=(y-1)%(GLINES-1))==0)
-         y=LMAX;
-       break;
-    case ' ': /* Activate a cell */
-      if (cells[(y-1)*CMAX+(x-1)] == 1){ /* Row-major order storage method */ 
-        cells[(y-1)*CMAX+(x-1)] = 0;
-         mvwaddch(game, y, x, ' ');
-      }
-      else {
-        cells[(y-1)*CMAX+(x-1)] = 1; 
-        mvwaddch(game, y, x, 'O');
-      }
-      break;
-    case '\n':
-      play_mode();
-      break;
-    case 'k':
-      return 0;
-  }
-  wmove(game, y, x); 
-  wrefresh(game);
-  return 1;
-}
+static int x,y,seed = 0; // (x,y) and number of cycles
 
 
-void play_mode(){
-  
-  int x , y , n;
-   
-  memcpy(nextcells, cells, LMAX*CMAX*sizeof(char));  
 
-  for (x = 1; x < GCOLS - 1; x++){
-    for(y= 1 ; y < GLINES - 1 ; y++){
-      n = nbAliveCells(y-1,x-1);
-      if (n == 3){
-        nextcells[(y-1)*CMAX+(x-1)] = 1; 
-        mvwaddch(game, y, x, 'O');
-      }   
-      else if( n < 2 || n > 3){
-	nextcells[(y-1)*CMAX+(x-1)] = 0;
-	mvwaddch(game, y, x, ' ');
-      }
-    }
-  }
-  memcpy(cells, nextcells, LMAX*CMAX*sizeof(char));
-  mvwprintw(stdscr,LINES - 5, (int)(COLS/20), "%s %d", cmds, ++seeds);
-  box(game,0,0);
-  wrefresh(game);
-
-}
-
-
-int nbAliveCells(int y, int x){
-  
-  int n  = 0;
-  
-  if(y < GLINES - 1 )
-  {
-    n += cells[(y+1)*CMAX+x] ? 1 : 0; /* Bottom */
-  }
-  if(y > 0)
-  {
-    n +=  cells[(y-1)*CMAX+x] ? 1 : 0; /* Top */
-  }
-
-  if(x < GCOLS - 1 )
-  {
-    n +=  cells[y*CMAX+(x+1)] ? 1 : 0; /* Right */
-    if(y > 0)
-    {
-      n += cells[(y-1)*CMAX+(x+1)] ? 1 : 0; /* Top right */
-     }
-    if(y < GLINES - 1 )
-     {
-       n +=  cells[(y+1)*CMAX+(x+1)] ? 1 : 0;/* Bottom right */
-     }
-  }
-  if(x >  0)
-  {
-    n += cells[y*CMAX+(x-1)] ? 1 : 0; /* Left */
-    if(y > 0)
-    {
-      n += cells[(y-1)*CMAX+(x-1)] ? 1 : 0; /* Top left */
-    }
-    if(y < GLINES - 1)
-    {
-      n += cells[(y+1)*CMAX+(x-1)] ? 1 : 0; /* Bottom left */
-    }
-  } 
-  
-  return n;
-}
-
-
-void run_splash(){
-
+void 
+run_splash(){
   char str_title[] = "Game Of Life";
-  char str_press[] = "Press a touch to continue";
-  
-  print_color(stdscr, LINES / 2, (COLS - strlen(str_title)) / 2, WHITE, str_title);
+  char str_press[] = "Press a key to continue";
+
+  print_color(stdscr, LINES / 2, (COLS - strlen(str_title)) / 2, WHITE , str_title);
   print_color(stdscr, LINES - 1.0, 0, BLUE, str_press);
   refresh();
   getch();
   erase();
+
 }
 
 
-void run_game(){ 
-  
-  
+void
+run_game(){
   char in;
 
-  GLINES = (int)((LINES*9)/10);
-  GCOLS = (int)((COLS*9)/10);
-  LMAX = GLINES - 2;
-  CMAX = GCOLS  - 2;
-  
-  cells = malloc(LMAX*CMAX*sizeof(char));
-  memset(cells, 0, LMAX*CMAX*sizeof(char));
+  t_LINES = (int) (LINES * 95 / 100);
+  t_COLS  = (int) (COLS  * 95 / 100);
 
-  nextcells = malloc(LMAX*CMAX*sizeof(char));
-  memset(nextcells, 0, LMAX*CMAX*sizeof(char));
+  /* Create tabs */
+  t1 = malloc(t_LINES*t_COLS*sizeof(unsigned char *));
+  t2 = malloc(t_LINES*t_COLS*sizeof(unsigned char *));
+  memset(t1, 0, t_LINES*t_COLS*sizeof(unsigned char *));
+  memset(t2, 0, t_LINES*t_COLS*sizeof(unsigned char *));
 
-  mvprintw(LINES - 5, (int)(COLS/20), "%s %d", cmds, seeds);
-  game = subwin(stdscr, GLINES , GCOLS , (int)(LINES/40) , (int)(COLS/20));
-  box(game,0,0);
-  wmove(game, GLINES / 2, GCOLS / 2);
+  cur_tab = t1;
+  tmp_tab = t2;
+
+  /* Set the command line */
+  print_color(stdscr,LINES - 1.0, COLS - t_COLS, BLUE, "zqsd : Move    space : (De)Activate    enter : Run    k : Quit");
+  mvprintw(LINES - 1.0, COLS + 65 - t_COLS, " Seed : %d", seed);
+
+  /* Create windows */
+  borderWin = newwin( t_LINES + 2, t_COLS + 2, 0 , (COLS - t_COLS) / 2);
+  gameWin = newwin( t_LINES, t_COLS, 1, ((COLS - t_COLS) /2) + 1);
+  box(borderWin, 0, 0);
+
+  /* Place the cursor in the game window */
+  wmove(gameWin, 0, 0);
+
+  /* Refresh windows*/
   refresh();
-  wrefresh(game);
-
+  wrefresh(borderWin);
+  wrefresh(gameWin);
+  
+  /* Process input */
   do {
     in = getch();
   }
   while(input_mode(in));
-}
-
-void destroy(){
-
-  delwin(game);
-  
-  free(cells);
-  free(nextcells);  
 
 }
 
+
+int 
+input_mode(char ch){
+  getyx(gameWin, y, x);
+  switch(ch){
+
+    case 'd': /* Right */
+      x= (x+1)%t_COLS; 
+      break;
+    case 'q': /* Left */
+      x= (x-1)%t_COLS;
+      break;
+    case 's': /* Down */    
+      y = (y+1)%t_LINES;
+      break;
+    case 'z': /* Up */
+      y= (y-1)%t_LINES;
+      break;
+
+    case ' ': /* Activate a cell */
+      if (cur_tab[(y)*t_COLS+(x)] == 1){ /* Row-major order storage method */ 
+        cur_tab[(y)*t_COLS+(x)] = 0;
+        mvwaddch(gameWin, y, x, ' ');
+      }
+      else {
+        cur_tab[(y)*t_COLS+(x)] = 1; 
+        mvwaddch(gameWin, y, x, 'O');
+      }
+      break;
+
+    case '\n':
+      /* play_mode(); */
+      break;
+
+    case 'k':
+      return 0;
+  }
+
+  mvprintw(0,0, "%d   ", x);
+  mvprintw(1,0, "%d   ", y);
+  mvprintw(2,0, "%d   ", t_COLS);
+  mvprintw(3,0, "%d   ", t_LINES);
+  refresh();
+
+  wmove(gameWin, y, x); 
+  wrefresh(gameWin);
+  return 1;
+
+}
+
+void 
+destroy(){
+  delwin(gameWin);
+  delwin(borderWin);
+  free(t1);
+  free(t2);
+}
