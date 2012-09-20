@@ -72,6 +72,9 @@ run_game(){
   }
   while(input_mode(in));
 
+
+
+
 }
 
 
