@@ -1,4 +1,4 @@
-﻿#include <string.h>
+#include <string.h>
 #include <ncurses.h>
 #include "utils.h"
 #include "Gameoflife.h"
