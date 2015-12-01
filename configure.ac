@@ -1,4 +1,4 @@
-AC_INIT([GameOfLife], [0.0], [adnot.maxence@gmail.com])
+AC_INIT([GameOfLife], [0.0], [contact@maxenceadnot.me])
 AC_PREREQ([2.60])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([foreign -Wall -Werror])
